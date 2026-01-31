@@ -8,16 +8,18 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
 
-def load_config(config_path="../config.yaml"):
+def load_config(config_path="./config.yaml"):
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
 
-def get_data(cfg):
+def get_data():
     """
     Args:
         cfg (dict): The configuration dictionary loaded from yaml
     """
     
+    cfg = load_config()
+
     data_cfg = cfg['data']
     model_cfg = cfg['model']
 
@@ -62,8 +64,3 @@ def get_data(cfg):
     test_loader = DataLoader(test_data, shuffle=False, **common_args)
 
     return train_loader, val_loader, test_loader
-
-
-if __name__ == "__main__":
-    config = load_config()
-    train_dl, val_dl, test_dl = get_data(config)
