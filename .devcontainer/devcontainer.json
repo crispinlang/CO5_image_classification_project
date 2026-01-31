@@ -1,0 +1,22 @@
+{
+  "name": "CO5 GenAI Fine Tuning",
+  "build": {
+    "dockerfile": "dockerfile"
+  },
+  "workspaceFolder": "/workspace",
+  "runArgs": [
+    "--gpus=all",
+    "--ipc=host"
+  ],
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ]
+    }
+  }
+}
