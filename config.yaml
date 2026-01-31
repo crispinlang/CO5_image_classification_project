@@ -1,5 +1,5 @@
 data:
-  dataset_path: "PATH/TO/DATA"
+  dataset_path: "CML/data/merged_dataset.nosync"
   image_size: 224
   batch_size: 256
   num_workers: 12

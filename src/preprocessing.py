@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
 
-def load_config(config_path="config.yaml"):
+def load_config(config_path="../config.yaml"):
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
 
@@ -65,7 +65,5 @@ def get_data(cfg):
 
 
 if __name__ == "__main__":
-
-    
-    config = load_config("config.yaml")
+    config = load_config()
     train_dl, val_dl, test_dl = get_data(config)
