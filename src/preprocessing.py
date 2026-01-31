@@ -24,19 +24,19 @@ def get_data():
     model_cfg = cfg['model']
 
     transform = transforms.Compose([
-        transforms.Resize((data_cfg['image_size'], data_cfg['image_size'])),
+        transforms.Resize((data_cfg['IMAGE_SIZE'], data_cfg['IMAGE_SIZE'])),
         transforms.ToTensor(),
-        transforms.Normalize(mean=model_cfg['mean'], std=model_cfg['std'])
+        transforms.Normalize(mean=model_cfg['MEAN'], std=model_cfg['STD'])
     ])
 
     dataset = datasets.ImageFolder(
-        root=data_cfg['dataset_path'],
+        root=data_cfg['DATASET_PATH'],
         transform=transform
     )
 
     N = len(dataset)
-    train_size = int(data_cfg['train_ratio'] * N)
-    val_size   = int(data_cfg['val_ratio'] * N)
+    train_size = int(data_cfg['TRAIN_RATIO'] * N)
+    val_size   = int(data_cfg['VAL_RATIO'] * N)
     test_size  = N - train_size - val_size
 
     train_data, val_data, test_data = random_split(
@@ -47,8 +47,8 @@ def get_data():
     print(f"Split: Train({len(train_data)}), Val({len(val_data)}), Test({len(test_data)})")
 
     common_args = {
-        'batch_size': data_cfg['batch_size'],
-        'num_workers': data_cfg['num_workers'],
+        'batch_size': data_cfg['BATCH_SIZE'],
+        'num_workers': data_cfg['NUM_WORKERS'],
         'pin_memory': True
     }
 
@@ -56,7 +56,7 @@ def get_data():
         train_data, 
         shuffle=True, 
         persistent_workers=True, 
-        prefetch_factor=data_cfg['prefetch_factor'],
+        num_workers=data_cfg['NUM_WORKERS'],
         **common_args
     )
     

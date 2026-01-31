@@ -1,13 +1,16 @@
 data:
-  dataset_path: "CML/data/merged_dataset.nosync"
-  image_size: 224
-  batch_size: 256
-  num_workers: 12
-  prefetch_factor: 4
-  train_ratio: 0.8
-  val_ratio: 0.1 
+  DATASET_PATH: "CML/data/merged_dataset.nosync"
+  IMAGE_SIZE: 224
+  BATCH_SIZE: 256
+  NUM_WORKERS: 12
+  PREFETCH_FACTOR: 4
+  TRAIN_RATIO: 0.8
+  VAL_RATIO: 0.1 
 
 model:
   # BioCLIP/OpenAI Normalization stats
-  mean: [0.48145466, 0.4578275, 0.40821073]
-  std:  [0.26862954, 0.26130258, 0.27577711]
+  MEAN: [0.48145466, 0.4578275, 0.40821073]
+  STD:  [0.26862954, 0.26130258, 0.27577711]
+
+hardware:
+  HARDWAREDEVICE: 'mps'
