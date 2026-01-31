@@ -1,2 +1,8 @@
+<<<<<<< HEAD
 src/__pycache__
 data/*
+=======
+
+# Ignore CML folder to avoid uploading unwanted files
+/CML
+>>>>>>> bb31242 (Adding the intermediate documentation of what needs to be done)
