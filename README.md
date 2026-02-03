@@ -1,4 +1,4 @@
-# Mushroom classfification project
+# MushroomCLIP project
 
 ![Title image](/img/title_image.jpg)
 *[Image citation](https://blog.mdpi.com/2023/02/21/importance-of-mushrooms/)*
@@ -9,15 +9,14 @@ The aim of this project is to fine-tune an existing open source version of the C
 
 The goal was to see, if fine-tuning a smaller parameter model with specific domain knowledge, which in this project was knowledge about various classes of mushrooms, could perform equally or even better then a model trained much more intently on a much larger dataset.
 
-The project was split into different parts which 
-
 ## Data gathering
 
 ### Acquisition
-The dataset consisting of ~100'000 images was adapted from a previously created Kaggle challenge [[3]](https://www.kaggle.com/datasets/zlatan599/mushroom1).
+The dataset consisting of ~100'000 images of different mushroom classes was adapted from a previously created Kaggle challenge [[3]](https://www.kaggle.com/datasets/zlatan599/mushroom1). After downloading the dataset, the final size came out to 12.2 GB of data made up of 169 individual classes of mushrooms spanning a total of 104'100 images. We split the data into three different parts: training (80%), testing (10%) and validation (10%). Initial analysis of the dataset did not reveal any imbalances to be taken care of so we agreed to continue to benchmarking the selected models before fine-tuning, to assess their zero-shot capabilities before any fine-tuning.
 
-## Preprocessing
-After downloading the data, the first step we took was to analyze the size of data that the group was working with. The dataset consisted of 
+- The BioCLIP model we chose to use was the 'bioclip-2' version [[4]](https://huggingface.co/imageomics/bioclip-2), which was trained on the 'TreeOfLife-200M' dataset. The basis of this model is the OpenCLIP model version 'ViT-14/L' [[5]](https://huggingface.co/laion/CLIP-ViT-L-14-laion2B-s32B-b82K) trained on the 'LAION-2B' dataset which is an English subset of the LAION-5B dataset. 
+- The OpenCLIP model we chose to use was the 'ViT-B-32' version, which was trained on a proprietary 'WIT-400M' dataset [[6]](https://huggingface.co/openai/clip-vit-base-patch32/tree/main). 
+
 
 ## Training/fine-tuning
 a
@@ -53,8 +52,8 @@ This project provides a [VS Code Dev Container](https://code.visualstudio.com/do
 <!-- #### Openclip results
 ![Openclip](img/openclip.png) -->
 
-<!-- #### Bioclip results
-![BioClip](img/bioclip.png) -->
+#### Bioclip results
+![BioClip](img/bioclip.png)
 
 
 
