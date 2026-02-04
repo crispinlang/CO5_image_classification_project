@@ -103,9 +103,6 @@ def inspect_class_imbalance(
     text_report_path.write_text(output_text + "\n", encoding="utf-8")
     report["text_report_path"] = str(text_report_path)
 
-    print(output_text)
-    print(f"\nSaved text report to: {text_report_path}")
-
     classes = list(report["per_class"].keys())
     counts = [report["per_class"][cls]["count"] for cls in classes]
     fig_width = max(12, min(24, int(len(classes) * 0.2)))
