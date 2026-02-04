@@ -1,6 +1,7 @@
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
+from statistics import mean, median, quantiles, stdev
 from typing import Dict, Any
 
 import matplotlib.pyplot as plt
@@ -18,7 +19,10 @@ def load_config(config_path: str = "./config.yaml") -> Dict[str, Any]:
 def inspect_class_imbalance(
     dataset_path: str | None = None,
     config_path: str = "./config.yaml",
-) -> Dict[str, Any]:
+    show_plot: bool = True,
+    print_stats: bool = True,
+    return_report: bool = False,
+) -> Dict[str, Any] | None:
     """
     Parse an ImageFolder-style dataset and report class imbalance.
 
@@ -58,6 +62,14 @@ def inspect_class_imbalance(
     max_count = class_counts[max_class]
     min_count = class_counts[min_class]
     imbalance_ratio = max_count / min_count if min_count else float("inf")
+    count_values = list(class_counts.values())
+    mean_count = mean(count_values)
+    median_count = median(count_values)
+    std_count = stdev(count_values) if len(count_values) > 1 else 0.0
+    if len(count_values) > 1:
+        q1_count, _, q3_count = quantiles(count_values, n=4, method="inclusive")
+    else:
+        q1_count = q3_count = float(count_values[0])
 
     per_class = {
         cls: {
@@ -80,6 +92,16 @@ def inspect_class_imbalance(
         "majority_class": {"name": max_class, "count": max_count},
         "minority_class": {"name": min_class, "count": min_count},
         "imbalance_ratio_majority_to_minority": round(imbalance_ratio, 4),
+        "class_count_summary": {
+            "min": min_count,
+            "max": max_count,
+            "mean": round(mean_count, 2),
+            "median": round(median_count, 2),
+            "std": round(std_count, 2),
+            "q1": round(q1_count, 2),
+            "q3": round(q3_count, 2),
+            "iqr": round(q3_count - q1_count, 2),
+        },
         "per_class": per_class,
         "suggested_class_weights": class_weights,
     }
@@ -89,14 +111,29 @@ def inspect_class_imbalance(
         f"Classes: {num_classes} | Images: {total_images}",
         "Imbalance ratio (majority/minority): "
         f"{report['imbalance_ratio_majority_to_minority']}",
+        (
+            "Class count stats | "
+            f"min: {report['class_count_summary']['min']} | "
+            f"max: {report['class_count_summary']['max']} | "
+            f"mean: {report['class_count_summary']['mean']} | "
+            f"median: {report['class_count_summary']['median']} | "
+            f"std: {report['class_count_summary']['std']} | "
+            f"q1: {report['class_count_summary']['q1']} | "
+            f"q3: {report['class_count_summary']['q3']} | "
+            f"iqr: {report['class_count_summary']['iqr']}"
+        ),
     ]
     output_lines.extend(
         f"- {cls}: {stats['count']} ({stats['percentage']}%)"
         for cls, stats in report["per_class"].items()
     )
     output_text = "\n".join(output_lines)
+    if print_stats:
+        print("\n".join(output_lines[:4]))
 
-    artifact_dir = Path("artifacts") / "inspection"
+    project_root = Path(__file__).resolve().parent.parent
+
+    artifact_dir = project_root / "artifacts" / "inspection"
     artifact_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     text_report_path = artifact_dir / f"class_imbalance_{timestamp}.txt"
@@ -113,6 +150,15 @@ def inspect_class_imbalance(
     plt.ylabel("Number of Images")
     plt.xticks(rotation=90, fontsize=8)
     plt.tight_layout()
-    plt.show()
+    img_dir = project_root / "img"
+    img_dir.mkdir(parents=True, exist_ok=True)
+    plot_path = img_dir / f"class_imbalance_{timestamp}.png"
+    plt.savefig(plot_path, dpi=300, bbox_inches="tight")
+    if show_plot:
+        plt.show()
+    plt.close()
+    report["plot_path"] = str(plot_path)
 
-    return report
+    if return_report:
+        return report
+    return None
