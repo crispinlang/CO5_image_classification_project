@@ -31,9 +31,17 @@ Based on this already developed framework we started working on the data import 
 
 ## Model
 
+### Model Specifications and Sources
+
+The BioCLIP model we chose to use was the original version [[4]](https://huggingface.co/imageomics/bioclip), which was trained on the 'TreeOfLife-10M' dataset. The basis of this model is the CLIP model version 'ViT-14/L' [[5]](https://huggingface.co/openai/clip-vit-base-patch16) trained on on a proprietary 'WIT-400M' dataset by OpenAI. Compared to the first BioCLIP iteration, the second version called 'bioclip-2' contains significantly more parameters (86M vs 304M) [[6]](https://imageomics.github.io/bioclip/),[[7]](https://arxiv.org/abs/2505.23883). Because we were unsure wether we wanted to scope to the project to include fine-tuning both a CLIP as well as a BioCLIP model, we chose to stick with the smaller sized 'BioCLIP' model, instead of the much larger 'bioclip-2'.
+
+The CLIP model we chose to use was the 'ViT-B-32' version, which was trained on the same proprietary 'WIT-400M' dataset from OpenAI, though the model weights are available [[8]](https://huggingface.co/openai/clip-vit-base-patch32/tree/main). The reason behind not choosing the same 'ViT-14/L' model as our basis was because we wanted to see if using a model using a larger patch size could still retain enough details from the training to perform well enough, without having to invest the computational load to fine-tune the finer grained model.
+
 ### Model Architecture and Methodology
 
-We organized the repository structure for ease of use and simplicity.
+This project provides a VS Code Dev Container [[9]](https://code.visualstudio.com/docs/devcontainers/containers) configuration that launches the required dependencies. The base image is the Nvidia PyTorch container [[10]](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch?version=25.11-py3) `nvcr.io/nvidia/pytorch:25.11-py3`, which includes GPU optimizations and support for the GB10 chip we used for this project.
+
+The repository structure was organized keeping ease of use and simplicity in mind like this:
 
 ```text
 CO5_image_classification_project/
@@ -51,7 +59,15 @@ CO5_image_classification_project/
 └── README.md
 ```
 
-To be able to access the user configurable variables needed to run the scripts we created and organized `config.yaml` using chapters that can then be called individually by each script using the `load_config` function. The following snippets show how the function is implemented and gives an overview of how this was used in practice:
+User-configurable variables are organized within `config.yaml` using chapters, allowing them to be called individually by each script via the `load_config` function. The implementation is shown below:
+
+```yaml
+### config.yaml chapter structuring
+data:
+  DATASET_PATH: 'path/to/data'
+  IMAGE_SIZE: 224
+  BATCH_SIZE: 256
+```
 
 ```python
 def load_config(config_path="./config.yaml"):
@@ -59,14 +75,7 @@ def load_config(config_path="./config.yaml"):
         return yaml.safe_load(f)
 ```
 
-This function could then be used by all scripts requiring variables. In the following example block is a snippet showing how we used this structuring in practice:
-
-```yaml
-data:
-  DATASET_PATH: 'path/to/data'
-  IMAGE_SIZE: 224
-  BATCH_SIZE: 256
-```
+This function is utilized by all scripts requiring variable access. The following snippets demonstrate how it was used within the code:
 
 ```python
 ### example for accessing a config chapter inside 'preprocessing.py'
@@ -81,15 +90,15 @@ dataset = datasets.ImageFolder(
 )
 ```
 
-### Model Specifications and Sources
+important functions such as the data gathering function `get_data` were written inside their own .py scripts and combined in the main project file `project.ipynb` where these functions were then called and used for the full project pipeline:
 
-The BioCLIP model we chose to use was the original version [[4]](https://huggingface.co/imageomics/bioclip), which was trained on the 'TreeOfLife-10M' dataset. The basis of this model is the CLIP model version 'ViT-14/L' [[5]](https://huggingface.co/openai/clip-vit-base-patch16) trained on on a proprietary 'WIT-400M' dataset by OpenAI. Compared to the first BioCLIP iteration, the second version called 'bioclip-2' contains significantly more parameters (86M vs 304M) [[6]](https://imageomics.github.io/bioclip/),[[7]](https://arxiv.org/abs/2505.23883). Because we were unsure wether we wanted to scope to the project to include fine-tuning both a CLIP as well as a BioCLIP model, we chose to stick with the smaller sized 'BioCLIP' model, instead of the much larger 'bioclip-2'.
-
-The CLIP model we chose to use was the 'ViT-B-32' version, which was trained on the same proprietary 'WIT-400M' dataset from OpenAI, though the model weights are available [[8]](https://huggingface.co/openai/clip-vit-base-patch32/tree/main). The reason behind not choosing the same 'ViT-14/L' model as our basis was because we wanted to see if using a model using a larger patch size could still retain enough details from the training to perform well enough, without having to invest the computational load to fine-tune the finer grained model.
+```text
+data import -> data processing -> model fine-tuning -> model evaluation
+```
 
 ### Training/fine-tuning
 
-After gathering these first insights into the models behaviour it was decided to move on to training the selected CLIP model using a fine-tuning approach. During the lectures from the CO5 course, we have alrady learned about using Low-Rank Adaptation (LoRA) [[9]](https://arxiv.org/abs/2106.09685) for efficient model tuning. We searched for a framework that allowed us to use LoRA in a straightforward way without having to develop our own system and found the 'peft' library developed by huggingface [[10]](https://huggingface.co/blog/peft),[[11]](https://arxiv.org/abs/2312.12148) that allows for the easy implementation of different fine-tuning approaches into an already existing training + inference loop.
+After gathering these first insights into the models behaviour it was decided to move on to training the selected CLIP model using a fine-tuning approach. During the lectures from the CO5 course, we have already learned about using Low-Rank Adaptation (LoRA) [[11]](https://arxiv.org/abs/2106.09685) for efficient model tuning. We searched for a framework that allowed us to use LoRA in a straightforward way without having to develop our own system and found the 'peft' library developed by huggingface [[11]](https://huggingface.co/blog/peft),[[12]](https://arxiv.org/abs/2312.12148) that allows for the easy implementation of different fine-tuning approaches into an already existing training + inference loop.
 
 ### Experimentation
 
@@ -130,33 +139,3 @@ From the MSLS pdf:
 - [ ] Explain and visualize your results. (5 scores)
 
 - [ ] List the lessons you learned and challenges you faced during the project. Point out further work or ideas. (5 scores)
-
-## Repository architecture
-
-<!-- ## Repository overview
-
-This project provides a [VS Code Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) configuration that launches the required dependencies. The base image is the [Nvidia PyTorch container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch?version=25.11-py3) `nvcr.io/nvidia/pytorch:25.11-py3`, which includes GPU optimizations and support for the GB10 chip we used for this project.
-
-### Main project idea:
-
-- __Image classification task__ using an already created mushroom dataset from kaggle
-
-    - https://www.kaggle.com/datasets/zlatan599/mushroom1/data
-    - to download the dataset from kaggle use the following command
-        - kaggle datasets download -d zlatan599/mushroom1 --unzip
-- __Benchmark model: BioCLIP__ which is a version of OpenCLIP that has been trained on 10M images of various biological images.
-    - BioClip: https://imageomics.github.io/bioclip/
-
-- use a version of OpenCLIP to fine-tune with the downloaded mushroom dataset from kaggle
-    - OpenClip Github Repo: https://github.com/mlfoundations/open_clip?tab=readme-ov-file
-    - model to use for fine-tuning: ViT-B-32
-
-## Main tasks:
-- data import pipeline: ERLEDIGT ROBIN
-- Benchmark OpenClip and BioClip (without fine-tune)
-
-<!-- #### Openclip results
-![Openclip](img/openclip.png) 
-
-#### Bioclip results
-![BioClip](img/bioclip.png) -->
