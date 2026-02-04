@@ -17,5 +17,3 @@ def tuning():
     model.print_trainable_parameters()
 
     return model
-
-tuning()
