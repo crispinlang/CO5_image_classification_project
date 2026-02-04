@@ -1,4 +1,4 @@
-# MushroomCLIP project
+# MushroomCLIP Documentation
 
 ![Title image](/img/title_image.jpg)
 [Image credit](https://blog.mdpi.com/2023/02/21/importance-of-mushrooms/)
@@ -17,7 +17,7 @@ The dataset consisting of ~100'000 images of different mushroom classes was adap
 
 ### Benchmarking
 
-Benchmarking the models without any modififiactions yielded interesting results:
+Benchmarking the models without any modification yielded interesting results:
 
 - The BioCLIP model had a final accuracy of 77.95% accuracy
 - The OpenCLIP model had a final accuracy of 9.26% accuracy
@@ -27,19 +27,61 @@ Benchmarking the models without any modififiactions yielded interesting results:
 
 These benchmarking tests clearly showed that when using a model not specifically trained on biological data, but rather on a dataset consisting of various data types, it lacked the needed domain knowledge for high accuracy class prediction.
 
-Based on this already developed framework we started working on the data import and pre-processing scripts that collect and format the data for further use.
-
-### Preprocessing
-
-```python
-preprocessing.py
-```
-
-Talk about the preprocessing script
+Based on this already developed framework we started working on the data import and pre-processing scripts that collect and format the data for further use which will be detailed further in the following chapter.
 
 ## Model
 
-### Model versions
+### Model Architecture and Methodology
+
+We organized the repository structure for ease of use and simplicity.
+
+```text
+CO5_image_classification_project/
+├── data/ 
+├── img/ 
+├── src/ 
+│ ├── preprocessing.py
+│ ├── tuning.py
+│ └── evaluation.py
+├── project.ipynb
+├── .devcontainer
+├── .gitignore
+├── config.yaml
+├── requirements.txt
+└── README.md
+```
+
+To be able to access the user configurable variables needed to run the scripts we created and organized `config.yaml` using chapters that can then be called individually by each script using the `load_config` function. The following snippets show how the function is implemented and gives an overview of how this was used in practice:
+
+```python
+def load_config(config_path="./config.yaml"):
+    with open(config_path, "r") as f:
+        return yaml.safe_load(f)
+```
+
+This function could then be used by all scripts requiring variables. In the following example block is a snippet showing how we used this structuring in practice:
+
+```yaml
+data:
+  DATASET_PATH: 'path/to/data'
+  IMAGE_SIZE: 224
+  BATCH_SIZE: 256
+```
+
+```python
+### example for accessing a config chapter inside 'preprocessing.py'
+cfg = load_config()
+data_cfg = cfg['data']
+model_cfg = cfg['model']
+
+### example usage of a specific variable from a config chapter inside 'preprocessing.py'
+dataset = datasets.ImageFolder(
+    root=data_cfg['DATASET_PATH'],
+    transform=transform
+)
+```
+
+### Model Specifications and Sources
 
 The BioCLIP model we chose to use was the original version [[4]](https://huggingface.co/imageomics/bioclip), which was trained on the 'TreeOfLife-10M' dataset. The basis of this model is the CLIP model version 'ViT-14/L' [[5]](https://huggingface.co/openai/clip-vit-base-patch16) trained on on a proprietary 'WIT-400M' dataset by OpenAI. Compared to the first BioCLIP iteration, the second version called 'bioclip-2' contains significantly more parameters (86M vs 304M) [[6]](https://imageomics.github.io/bioclip/),[[7]](https://arxiv.org/abs/2505.23883). Because we were unsure wether we wanted to scope to the project to include fine-tuning both a CLIP as well as a BioCLIP model, we chose to stick with the smaller sized 'BioCLIP' model, instead of the much larger 'bioclip-2'.
 
@@ -90,24 +132,6 @@ From the MSLS pdf:
 - [ ] List the lessons you learned and challenges you faced during the project. Point out further work or ideas. (5 scores)
 
 ## Repository architecture
-
-The repository structure is organized like this:
-
-```text
-CO5_image_classification_project/
-├── data/ 
-├── img/ 
-├── src/ 
-│ ├── preprocessing.py
-│ ├── tuning.py
-│ └── evaluation.py
-├── project.ipynb
-├── .devcontainer
-├── .gitignore
-├── config.yaml
-├── requirements.txt
-└── README.md
-```
 
 <!-- ## Repository overview
 
