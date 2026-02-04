@@ -1,10 +1,9 @@
 from collections import Counter
 from datetime import datetime
+import hashlib
 from pathlib import Path
 from statistics import mean, median, quantiles, stdev
 from typing import Dict, Any
-
-import matplotlib.pyplot as plt
 import yaml
 
 
@@ -14,6 +13,97 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tiff"}
 def load_config(config_path: str = "./config.yaml") -> Dict[str, Any]:
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
+
+
+def duplicates(
+    dataset_path: str | None = None,
+    config_path: str = "./config.yaml",
+    hash_algorithm: str = "sha256",
+    return_report: bool = False,
+    print_stats: bool = True,
+) -> Dict[str, Any] | None:
+    """
+    Parse image files under `dataset_path` and detect exact duplicates by content hash.
+    """
+    if dataset_path is None:
+        cfg = load_config(config_path)
+        dataset_path = cfg["data"]["DATASET_PATH"]
+
+    root = Path(dataset_path)
+    if not root.exists():
+        raise FileNotFoundError(f"Dataset path not found: {root}")
+    if not root.is_dir():
+        raise NotADirectoryError(f"Dataset path must be a directory: {root}")
+
+    image_files = sorted(
+        fp for fp in root.rglob("*") if fp.is_file() and fp.suffix.lower() in IMAGE_EXTENSIONS
+    )
+    if not image_files:
+        raise ValueError(f"No images found under: {root}")
+
+    try:
+        hashlib.new(hash_algorithm)
+    except ValueError as e:
+        raise ValueError(f"Unsupported hash algorithm: {hash_algorithm}") from e
+
+    hash_to_files: dict[str, list[str]] = {}
+    for image_path in image_files:
+        hasher = hashlib.new(hash_algorithm)
+        with open(image_path, "rb") as f:
+            for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                hasher.update(chunk)
+        digest = hasher.hexdigest()
+        hash_to_files.setdefault(digest, []).append(str(image_path))
+
+    duplicate_groups = [
+        {"hash": file_hash, "files": paths, "count": len(paths)}
+        for file_hash, paths in hash_to_files.items()
+        if len(paths) > 1
+    ]
+    duplicate_groups.sort(key=lambda g: g["count"], reverse=True)
+
+    duplicate_files = sum(group["count"] for group in duplicate_groups)
+    unique_duplicate_files = sum(group["count"] - 1 for group in duplicate_groups)
+    report = {
+        "dataset_path": str(root),
+        "hash_algorithm": hash_algorithm,
+        "total_images_scanned": len(image_files),
+        "duplicate_group_count": len(duplicate_groups),
+        "duplicate_file_count": duplicate_files,
+        "redundant_duplicate_file_count": unique_duplicate_files,
+        "duplicate_groups": duplicate_groups,
+    }
+
+    output_lines = [
+        f"Dataset: {report['dataset_path']}",
+        f"Images scanned: {report['total_images_scanned']}",
+        f"Duplicate groups: {report['duplicate_group_count']}",
+        f"Duplicate files (including originals): {report['duplicate_file_count']}",
+        f"Redundant duplicate files: {report['redundant_duplicate_file_count']}",
+    ]
+    if print_stats:
+        print("\n".join(output_lines))
+
+    project_root = Path(__file__).resolve().parent.parent
+    artifact_dir = project_root / "artifacts" / "inspection"
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    text_report_path = artifact_dir / f"duplicate_images_{timestamp}.txt"
+
+    report_lines = output_lines.copy()
+    if duplicate_groups:
+        report_lines.append("")
+        report_lines.append("Duplicate groups:")
+        for idx, group in enumerate(duplicate_groups, start=1):
+            report_lines.append(f"{idx}. hash={group['hash']} count={group['count']}")
+            for image_path in group["files"]:
+                report_lines.append(f"   - {image_path}")
+    text_report_path.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
+    report["text_report_path"] = str(text_report_path)
+
+    if return_report:
+        return report
+    return None
 
 
 def class_imbalance(
@@ -35,6 +125,13 @@ def class_imbalance(
     if dataset_path is None:
         cfg = load_config(config_path)
         dataset_path = cfg["data"]["DATASET_PATH"]
+    try:
+        import matplotlib.pyplot as plt
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            "matplotlib is required for class_imbalance plotting. "
+            "Install it or set up the environment with plotting dependencies."
+        ) from e
 
     root = Path(dataset_path)
     if not root.exists():
