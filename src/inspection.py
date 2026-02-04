@@ -16,7 +16,7 @@ def load_config(config_path: str = "./config.yaml") -> Dict[str, Any]:
         return yaml.safe_load(f)
 
 
-def inspect_class_imbalance(
+def class_imbalance(
     dataset_path: str | None = None,
     config_path: str = "./config.yaml",
     show_plot: bool = True,
