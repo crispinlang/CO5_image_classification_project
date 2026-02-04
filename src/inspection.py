@@ -2,6 +2,8 @@ from collections import Counter
 from datetime import datetime
 import hashlib
 from pathlib import Path
+import random
+import re
 from statistics import mean, median, quantiles, stdev
 from typing import Dict, Any
 import yaml
@@ -256,6 +258,110 @@ def class_imbalance(
     plt.close()
     report["plot_path"] = str(plot_path)
 
+    if return_report:
+        return report
+    return None
+
+
+def preview(
+    grid_size: int,
+    species: str = "random",
+    dataset_path: str | None = None,
+    config_path: str = "./config.yaml",
+    show_plot: bool = True,
+    return_report: bool = False,
+) -> Dict[str, Any] | None:
+    """
+    Create a tiled preview image for one class.
+
+    Example:
+      preview(20) -> 20x20 grid (400 images).
+    """
+    if grid_size <= 0:
+        raise ValueError("grid_size must be a positive integer.")
+
+    try:
+        import matplotlib.pyplot as plt
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            "matplotlib is required for preview plotting. "
+            "Install it or set up the environment with plotting dependencies."
+        ) from e
+
+    try:
+        from PIL import Image
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            "Pillow is required for image previews. Install it to use preview()."
+        ) from e
+
+    if dataset_path is None:
+        cfg = load_config(config_path)
+        dataset_path = cfg["data"]["DATASET_PATH"]
+
+    root = Path(dataset_path)
+    if not root.exists():
+        raise FileNotFoundError(f"Dataset path not found: {root}")
+    if not root.is_dir():
+        raise NotADirectoryError(f"Dataset path must be a directory: {root}")
+
+    class_to_images: dict[str, list[Path]] = {}
+    for class_dir in sorted(p for p in root.iterdir() if p.is_dir()):
+        images = sorted(
+            fp for fp in class_dir.rglob("*") if fp.is_file() and fp.suffix.lower() in IMAGE_EXTENSIONS
+        )
+        if images:
+            class_to_images[class_dir.name] = images
+
+    if not class_to_images:
+        raise ValueError(f"No images found in class folders under: {root}")
+
+    if species == "random":
+        selected_species = random.choice(list(class_to_images.keys()))
+    else:
+        if species not in class_to_images:
+            available = ", ".join(sorted(class_to_images.keys()))
+            raise ValueError(
+                f"Unknown species '{species}'. Choose one of: {available} or 'random'."
+            )
+        selected_species = species
+
+    species_images = class_to_images[selected_species]
+    tiles = grid_size * grid_size
+    if len(species_images) >= tiles:
+        sampled_images = random.sample(species_images, tiles)
+    else:
+        sampled_images = random.choices(species_images, k=tiles)
+
+    fig, axes = plt.subplots(grid_size, grid_size, figsize=(grid_size * 0.9, grid_size * 0.9))
+    axes_flat = axes.flat if hasattr(axes, "flat") else [axes]
+    for ax, image_path in zip(axes_flat, sampled_images):
+        with Image.open(image_path) as img:
+            ax.imshow(img.convert("RGB"))
+        ax.axis("off")
+    fig.suptitle(f"Species: {selected_species} | Grid: {grid_size}x{grid_size}", fontsize=12)
+    plt.tight_layout()
+
+    project_root = Path(__file__).resolve().parent.parent
+    img_dir = project_root / "img"
+    img_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    species_slug = re.sub(r"[^A-Za-z0-9._-]+", "_", selected_species).strip("_") or "species"
+    plot_path = img_dir / f"preview_{species_slug}_{grid_size}x{grid_size}_{timestamp}.png"
+    plt.savefig(plot_path, dpi=300, bbox_inches="tight")
+    if show_plot:
+        plt.show()
+    plt.close(fig)
+
+    report = {
+        "dataset_path": str(root),
+        "selected_species": selected_species,
+        "grid_size": grid_size,
+        "tiles": tiles,
+        "available_images_for_species": len(species_images),
+        "sampling_with_replacement": len(species_images) < tiles,
+        "plot_path": str(plot_path),
+    }
     if return_report:
         return report
     return None
