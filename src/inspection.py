@@ -1,7 +1,9 @@
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any
 
+import matplotlib.pyplot as plt
 import yaml
 
 
@@ -82,13 +84,38 @@ def inspect_class_imbalance(
         "suggested_class_weights": class_weights,
     }
 
-    print(f"Dataset: {report['dataset_path']}")
-    print(f"Classes: {num_classes} | Images: {total_images}")
-    print(
+    output_lines = [
+        f"Dataset: {report['dataset_path']}",
+        f"Classes: {num_classes} | Images: {total_images}",
         "Imbalance ratio (majority/minority): "
-        f"{report['imbalance_ratio_majority_to_minority']}"
+        f"{report['imbalance_ratio_majority_to_minority']}",
+    ]
+    output_lines.extend(
+        f"- {cls}: {stats['count']} ({stats['percentage']}%)"
+        for cls, stats in report["per_class"].items()
     )
-    for cls, stats in report["per_class"].items():
-        print(f"- {cls}: {stats['count']} ({stats['percentage']}%)")
+    output_text = "\n".join(output_lines)
+
+    artifact_dir = Path("artifacts") / "inspection"
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    text_report_path = artifact_dir / f"class_imbalance_{timestamp}.txt"
+    text_report_path.write_text(output_text + "\n", encoding="utf-8")
+    report["text_report_path"] = str(text_report_path)
+
+    print(output_text)
+    print(f"\nSaved text report to: {text_report_path}")
+
+    classes = list(report["per_class"].keys())
+    counts = [report["per_class"][cls]["count"] for cls in classes]
+    fig_width = max(12, min(24, int(len(classes) * 0.2)))
+    plt.figure(figsize=(fig_width, 6))
+    plt.bar(classes, counts)
+    plt.title("Class Distribution")
+    plt.xlabel("Class")
+    plt.ylabel("Number of Images")
+    plt.xticks(rotation=90, fontsize=8)
+    plt.tight_layout()
+    plt.show()
 
     return report
