@@ -263,7 +263,7 @@ def class_imbalance(
     return None
 
 
-def preview(
+def preview_specimens(
     grid_size: int,
     species: str = "random",
     dataset_path: str | None = None,
@@ -360,6 +360,98 @@ def preview(
         "tiles": tiles,
         "available_images_for_species": len(species_images),
         "sampling_with_replacement": len(species_images) < tiles,
+        "plot_path": str(plot_path),
+    }
+    if return_report:
+        return report
+    return None
+
+
+def preview_species(
+    grid_size: int,
+    dataset_path: str | None = None,
+    config_path: str = "./config.yaml",
+    show_plot: bool = True,
+    return_report: bool = False,
+) -> Dict[str, Any] | None:
+    """
+    Create a tiled preview image across random species.
+
+    Example:
+      preview_species(20) -> 20x20 grid (400 images), each tile sampled from a random class.
+    """
+    if grid_size <= 0:
+        raise ValueError("grid_size must be a positive integer.")
+
+    try:
+        import matplotlib.pyplot as plt
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            "matplotlib is required for preview plotting. "
+            "Install it or set up the environment with plotting dependencies."
+        ) from e
+
+    try:
+        from PIL import Image
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            "Pillow is required for image previews. Install it to use preview_species()."
+        ) from e
+
+    if dataset_path is None:
+        cfg = load_config(config_path)
+        dataset_path = cfg["data"]["DATASET_PATH"]
+
+    root = Path(dataset_path)
+    if not root.exists():
+        raise FileNotFoundError(f"Dataset path not found: {root}")
+    if not root.is_dir():
+        raise NotADirectoryError(f"Dataset path must be a directory: {root}")
+
+    class_to_images: dict[str, list[Path]] = {}
+    for class_dir in sorted(p for p in root.iterdir() if p.is_dir()):
+        images = sorted(
+            fp for fp in class_dir.rglob("*") if fp.is_file() and fp.suffix.lower() in IMAGE_EXTENSIONS
+        )
+        if images:
+            class_to_images[class_dir.name] = images
+
+    if not class_to_images:
+        raise ValueError(f"No images found in class folders under: {root}")
+
+    class_names = list(class_to_images.keys())
+    tiles = grid_size * grid_size
+    sampled_classes = random.choices(class_names, k=tiles)
+    sampled_pairs = [(cls, random.choice(class_to_images[cls])) for cls in sampled_classes]
+
+    fig, axes = plt.subplots(grid_size, grid_size, figsize=(grid_size * 0.9, grid_size * 0.9))
+    axes_flat = axes.flat if hasattr(axes, "flat") else [axes]
+    for ax, (species_name, image_path) in zip(axes_flat, sampled_pairs):
+        with Image.open(image_path) as img:
+            ax.imshow(img.convert("RGB"))
+        ax.set_title(species_name, fontsize=6)
+        ax.axis("off")
+    fig.suptitle(f"Random Species Preview | Grid: {grid_size}x{grid_size}", fontsize=12)
+    plt.tight_layout()
+
+    project_root = Path(__file__).resolve().parent.parent
+    img_dir = project_root / "img"
+    img_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    plot_path = img_dir / f"preview_species_{grid_size}x{grid_size}_{timestamp}.png"
+    plt.savefig(plot_path, dpi=300, bbox_inches="tight")
+    if show_plot:
+        plt.show()
+    plt.close(fig)
+
+    unique_species = sorted(set(sampled_classes))
+    report = {
+        "dataset_path": str(root),
+        "grid_size": grid_size,
+        "tiles": tiles,
+        "total_species_available": len(class_names),
+        "species_shown_count": len(unique_species),
+        "species_shown": unique_species,
         "plot_path": str(plot_path),
     }
     if return_report:
