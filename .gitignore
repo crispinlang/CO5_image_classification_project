@@ -4,6 +4,7 @@ src/__init__.py
 data/*
 /CML
 model/
+artifacts/
 
 # Ignore CML folder to avoid uploading unwanted files
 /CML
