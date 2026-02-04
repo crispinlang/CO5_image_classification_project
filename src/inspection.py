@@ -7,15 +7,10 @@ import re
 from statistics import mean, median, quantiles, stdev
 from typing import Dict, Any
 import yaml
+from helpers import load_config
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tiff"}
-
-
-def load_config(config_path: str = "./config.yaml") -> Dict[str, Any]:
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)
-
 
 def duplicates(
     dataset_path: str | None = None,

@@ -7,8 +7,8 @@ import torch
 import open_clip
 from tqdm import tqdm
 
-from src.preprocessing import load_config
-from src.preprocessing import get_data
+from helpers import load_config
+from preprocessing import get_data
 
 cfg = load_config()
 data_cfg = cfg['data']
