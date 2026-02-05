@@ -25,7 +25,7 @@ def fine_tuning(model_name="openai/clip-vit-base-patch32"):
     model = build_model(model_name=model_name)
     train_data, val_data, test_data, labels = prepare_data()
     processor = clip_processor(model_name=model_name)
-    collator = clip_collator() #tbd
+    collator = clip_collator(processor=processor)
     model = build_model(model_name=model_name)
     
 
