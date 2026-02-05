@@ -19,11 +19,8 @@ The dataset consisting of ~100'000 images of different mushroom classes was adap
 
 Benchmarking the models without any modification yielded interesting results:
 
-- The BioCLIP model had a final accuracy of 77.95% accuracy
-- The OpenCLIP model had a final accuracy of 9.26% accuracy
-
-<!-- decide wether to keep or remove the images... -->
-<!-- ![alt-text-1](img/openclip.png) ![alt-text-2](img/bioclip.png) -->
+- The BioCLIP model had a final accuracy of 77.71% accuracy
+- The OpenCLIP model had a final accuracy of 9.64% accuracy
 
 These benchmarking tests clearly showed that when using a model not specifically trained on biological data, but rather on a dataset consisting of various data types, it lacked the needed domain knowledge for high accuracy class prediction.
 
