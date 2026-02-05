@@ -1,7 +1,7 @@
 from datasets import load_dataset
 from helpers import load_config
 
-def prepare_data(prompt="a photo of {}"):
+def prepare_data(seed, prompt):
     cfg = load_config()
     data_cfg = cfg["data"]
 
@@ -44,4 +44,28 @@ def prepare_data(prompt="a photo of {}"):
     """
     ['a photo of Agaricus augustus', 'a photo of Agaricus augustus', 'a photo of Agaricus augustus', 'a photo of Agaricus augustus', 'a photo of Agaricus augustus']
     """
+
+    n = len(ds)
+    train_size = int(data_cfg["TRAIN_RATIO"] * n)
+    val_size = int(data_cfg["VAL_RATIO"] * n)
+    test_size = n - train_size - val_size
+
+    # random split does a random shuffle. probably not suitable for our dataset. i'll implement stratification later when the pipeline works
+    split = ds.train_test_split(test_size=(val_size + test_size), seed=seed)
+    train_data = split["train"]
+    rest = split["test"]
+
+    val_test = rest.train_test_split(test_size=test_size, seed=seed)
+    val_data = val_test["train"]
+    test_data = val_test["test"]
+
+    print(f"Total images: {n}")
+    print(f"Split: Train({len(train_data)}), Val({len(val_data)}), Test({len(test_data)})")
+
     return
+
+prepare_data(1, "a photo of {}")
+"""
+Total images: 104088
+Split: Train(83270), Val(10408), Test(10410)
+"""
