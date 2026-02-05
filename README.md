@@ -45,15 +45,15 @@ CO5_image_classification_project/
 ├── data/ 
 ├── img/ 
 ├── src/ 
+│ ├── benchmark.py
+│ ├── evaluation.py
 │ ├── preprocessing.py
-│ ├── tuning.py
-│ └── evaluation.py
-├── project.ipynb
-├── .devcontainer
+│ └── tuning.py
 ├── .gitignore
+├── README.md
 ├── config.yaml
-├── requirements.txt
-└── README.md
+├── .devcontainer
+└── project.ipynb
 ```
 
 User-configurable variables are organized within `config.yaml` using chapters, allowing them to be called individually by each script via the `load_config` function. The implementation is shown below:
