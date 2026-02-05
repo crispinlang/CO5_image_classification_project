@@ -1,7 +1,7 @@
 from datasets import load_dataset
 from helpers import load_config
 
-def prepare_data(seed, prompt):
+def prepare_data(seed=1, prompt="a photo of {}"):
     cfg = load_config()
     data_cfg = cfg["data"]
 
@@ -61,11 +61,11 @@ def prepare_data(seed, prompt):
 
     print(f"Total images: {n}")
     print(f"Split: Train({len(train_data)}), Val({len(val_data)}), Test({len(test_data)})")
+    """
+    Total images: 104088
+    Split: Train(83270), Val(10408), Test(10410)
+    """
 
-    return
+    return train_data, val_data, test_data, labels
 
-prepare_data(1, "a photo of {}")
-"""
-Total images: 104088
-Split: Train(83270), Val(10408), Test(10410)
-"""
+#prepare_data(1, "a photo of {}")
