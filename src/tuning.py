@@ -26,13 +26,14 @@ def fine_tuning(
     output_dir="../model/mushroomCLIP",
     learning_rate=1e-3,
     num_train_epochs=2,
+    split_method=None,
 ):
 
     cfg = load_config()
     data_cfg = cfg["data"]
 
     model = build_model(model_name=model_name)
-    train_data, val_data, test_data, labels = prepare_data()
+    train_data, val_data, test_data, labels = prepare_data(split_method=split_method)
     processor = clip_processor(model_name=model_name)
     collator = clip_collator(processor=processor)
     model = build_model(model_name=model_name)

@@ -3,7 +3,7 @@ from datasets import load_dataset
 from src.helpers import load_config, build_image_transform
 
 
-def prepare_data(seed=1, prompt="a photo of {}"):
+def prepare_data(seed=1, prompt="a photo of {}", split_method=None):
     cfg = load_config()
     data_cfg = cfg["data"]
 
@@ -64,12 +64,36 @@ def prepare_data(seed=1, prompt="a photo of {}"):
     val_size = int(data_cfg["VAL_RATIO"] * n)
     test_size = n - train_size - val_size
 
-    # random split does a random shuffle. probably not suitable for our dataset. i'll implement stratification later when the pipeline works
-    split = ds.train_test_split(test_size=(val_size + test_size), seed=seed)
+    if split_method is None:
+        split_method = data_cfg.get("SPLIT_METHOD", "random")
+
+    split_kwargs = {"test_size": (val_size + test_size), "seed": seed}
+    if split_method == "stratified":
+        split_kwargs["stratify_by_column"] = "label"
+
+    try:
+        split = ds.train_test_split(**split_kwargs)
+    except Exception as exc:
+        if split_method == "stratified":
+            print(f"Stratified split failed ({exc}). Falling back to random split.")
+            split = ds.train_test_split(test_size=(val_size + test_size), seed=seed)
+        else:
+            raise
     train_data = split["train"]
     rest = split["test"]
 
-    val_test = rest.train_test_split(test_size=test_size, seed=seed)
+    val_test_kwargs = {"test_size": test_size, "seed": seed}
+    if split_method == "stratified":
+        val_test_kwargs["stratify_by_column"] = "label"
+
+    try:
+        val_test = rest.train_test_split(**val_test_kwargs)
+    except Exception as exc:
+        if split_method == "stratified":
+            print(f"Stratified val/test split failed ({exc}). Falling back to random split.")
+            val_test = rest.train_test_split(test_size=test_size, seed=seed)
+        else:
+            raise
     val_data = val_test["train"]
     test_data = val_test["test"]
 
