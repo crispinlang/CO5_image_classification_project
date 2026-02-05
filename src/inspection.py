@@ -7,7 +7,7 @@ import re
 from statistics import mean, median, quantiles, stdev
 from typing import Dict, Any
 import yaml
-from helpers import load_config
+from src.helpers import load_config
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tiff"}

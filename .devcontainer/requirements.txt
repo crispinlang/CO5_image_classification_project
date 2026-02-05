@@ -9,7 +9,11 @@ braceexpand
 huggingface_hub
 safetensors
 transformers[sentencepiece]
+peft
+accelerate
+pillow
 timm>=1.0.17
 fsspec
 kagglehub
-open_clip
+open-clip-torch
+ipywidgets
