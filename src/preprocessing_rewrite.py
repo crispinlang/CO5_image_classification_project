@@ -1,7 +1,7 @@
 from datasets import load_dataset
 from torchvision import transforms
 
-from helpers import load_config
+from src.helpers import load_config
 
 def _build_image_transform(cfg):
     size = cfg["data"]["IMAGE_SIZE"]
@@ -42,7 +42,11 @@ def prepare_data(seed=1, prompt="a photo of {}"):
     image_transform = _build_image_transform(cfg)
 
     def apply_resize(example):
-        example["image"] = image_transform(example["image"])
+        images = example["image"]
+        if isinstance(images, list):
+            example["image"] = [image_transform(img) for img in images]
+        else:
+            example["image"] = image_transform(images)
         return example
 
     ds = ds.with_transform(apply_resize)
@@ -82,8 +86,3 @@ def prepare_data(seed=1, prompt="a photo of {}"):
     """
 
     return train_data, val_data, test_data, labels
-
-def get_preprocessed_splits(seed=1, prompt="a photo of {}"):
-    return prepare_data(seed=seed, prompt=prompt)
-
-# prepare_data(1, "a photo of {}")
