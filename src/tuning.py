@@ -1,7 +1,8 @@
 from peft import LoraConfig, get_peft_model
 from transformers import CLIPModel, Trainer, TrainingArguments
-from preprocessing_rewrite import prepare_data
-from clip_processing import clip_collator, clip_processor
+from src.preprocessing_rewrite import prepare_data
+from src.clip_processing import clip_collator, clip_processor
+from src.helpers import load_config
 
 def build_model(model_name="openai/clip-vit-base-patch32"):
     # GitHub PEFT: https://github.com/huggingface/peft
@@ -20,7 +21,15 @@ def build_model(model_name="openai/clip-vit-base-patch32"):
     model.print_trainable_parameters()
     return model
 
-def fine_tuning(model_name="openai/clip-vit-base-patch32"):
+def fine_tuning(
+    model_name="openai/clip-vit-base-patch32",
+    output_dir="../model/mushroomCLIP",
+    learning_rate=1e-3,
+    num_train_epochs=2,
+):
+
+    cfg = load_config()
+    data_cfg = cfg["data"]
 
     model = build_model(model_name=model_name)
     train_data, val_data, test_data, labels = prepare_data()
@@ -31,15 +40,17 @@ def fine_tuning(model_name="openai/clip-vit-base-patch32"):
 
     #https://huggingface.co/docs/peft/main/quicktour
     training_args = TrainingArguments(
-        output_dir="../model/mushroomCLIP",
-        learning_rate=1e-3,
-        per_device_train_batch_size=32,
-        per_device_eval_batch_size=32,
-        num_train_epochs=2,
+        output_dir=output_dir,
+        learning_rate=learning_rate,
+        per_device_train_batch_size=data_cfg["BATCH_SIZE"],
+        per_device_eval_batch_size=data_cfg["BATCH_SIZE"],
+        dataloader_num_workers=data_cfg["NUM_WORKERS"],
+        num_train_epochs=num_train_epochs,
         weight_decay=0.01,
         eval_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
+        remove_unused_columns=False
     )
 
     trainer = Trainer(
@@ -55,3 +66,7 @@ def fine_tuning(model_name="openai/clip-vit-base-patch32"):
     )
 
     trainer.train()
+    model.save_pretrained(training_args.output_dir)
+    processor.save_pretrained(training_args.output_dir)
+
+    return model, trainer, test_data
