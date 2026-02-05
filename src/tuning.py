@@ -1,24 +1,34 @@
 from peft import LoraConfig, get_peft_model
-from transformers import CLIPModel, Trainer
+from transformers import CLIPModel, Trainer, TrainingArguments
+from preprocessing_rewrite import prepare_data
+from clip_processing import clip_collator, clip_processor
 
-def build_model():
+def build_model(model_name="openai/clip-vit-base-patch32"):
     # GitHub PEFT: https://github.com/huggingface/peft
     # OpenClip model: https://huggingface.co/openai/clip-vit-base-patch16
 
-    model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-
     peft_config = LoraConfig(
-    r=16,
-    lora_alpha=32,
-    target_modules=["q_proj", "v_proj"] # these are the modules that need to be fine tuned for openCLIP modelss
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.1,
+        bias="none",
+        target_modules=["q_proj", "v_proj"],
     )
 
+    model = CLIPModel.from_pretrained(model_name)
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
-
     return model
 
-def fine_tuning():
+def fine_tuning(model_name="openai/clip-vit-base-patch32"):
+
+    model = build_model(model_name=model_name)
+    train_data, val_data, test_data, labels = prepare_data()
+    processor = clip_processor(model_name=model_name)
+    collator = clip_collator() #tbd
+    model = build_model(model_name=model_name)
+    
+
     #https://huggingface.co/docs/peft/main/quicktour
     training_args = TrainingArguments(
         output_dir="../model/mushroomCLIP",
@@ -35,13 +45,13 @@ def fine_tuning():
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=tokenized_datasets["train"],
-        eval_dataset=tokenized_datasets["test"],
-        processing_class=tokenizer,
-        data_collator=data_collator,
-        compute_metrics=compute_metrics,
+        train_dataset=train_data, 
+        eval_dataset=val_data,
+        # not needed with CLIPProcessor:
+        # processing_class=tokenizer,
+        data_collator=collator,
+        # ignoring for now:
+        # compute_metrics=compute_metrics,
     )
 
     trainer.train()
-
-    model.save_pretrained("output_dir")
