@@ -24,3 +24,25 @@ labels = ds.features["label"].names
 """
 ['Agaricus augustus', 'Agaricus xanthodermus', 'Amanita amerirubescens', 'Amanita augusta', 'Amanita brunnescens']
 """
+
+prompt = "a photo of {}"
+
+def add_prompt(example):
+    classes = example["label"]
+    example["text"] = prompt.format(labels[classes])
+    return example
+
+ds = ds.map(add_prompt) # https://huggingface.co/docs/datasets/en/image_process
+
+# print(ds)
+"""
+Dataset({
+    features: ['image', 'label', 'text'],
+    num_rows: 104088
+})
+"""
+
+# print(ds["text"][:5])
+"""
+['a photo of Agaricus augustus', 'a photo of Agaricus augustus', 'a photo of Agaricus augustus', 'a photo of Agaricus augustus', 'a photo of Agaricus augustus']
+"""
