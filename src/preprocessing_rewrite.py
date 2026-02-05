@@ -1,5 +1,12 @@
 from datasets import load_dataset
+from torchvision import transforms
+
 from helpers import load_config
+
+def _build_image_transform(cfg):
+    size = cfg["data"]["IMAGE_SIZE"]
+    return transforms.Resize((size, size))
+
 
 def prepare_data(seed=1, prompt="a photo of {}"):
     cfg = load_config()
@@ -31,6 +38,14 @@ def prepare_data(seed=1, prompt="a photo of {}"):
         return example
 
     ds = ds.map(add_prompt) # https://huggingface.co/docs/datasets/en/image_process
+
+    image_transform = _build_image_transform(cfg)
+
+    def apply_resize(example):
+        example["image"] = image_transform(example["image"])
+        return example
+
+    ds = ds.with_transform(apply_resize)
 
     # print(ds)
     """
@@ -68,4 +83,7 @@ def prepare_data(seed=1, prompt="a photo of {}"):
 
     return train_data, val_data, test_data, labels
 
-#prepare_data(1, "a photo of {}")
+def get_preprocessed_splits(seed=1, prompt="a photo of {}"):
+    return prepare_data(seed=seed, prompt=prompt)
+
+# prepare_data(1, "a photo of {}")
