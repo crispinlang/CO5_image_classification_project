@@ -1,11 +1,6 @@
 from datasets import load_dataset
-from torchvision import transforms
 
-from src.helpers import load_config
-
-def _build_image_transform(cfg):
-    size = cfg["data"]["IMAGE_SIZE"]
-    return transforms.Resize((size, size))
+from src.helpers import load_config, build_image_transform
 
 
 def prepare_data(seed=1, prompt="a photo of {}"):
@@ -39,7 +34,7 @@ def prepare_data(seed=1, prompt="a photo of {}"):
 
     ds = ds.map(add_prompt) # https://huggingface.co/docs/datasets/en/image_process
 
-    image_transform = _build_image_transform(cfg)
+    image_transform = build_image_transform(cfg)
 
     def apply_resize(example):
         images = example["image"]
