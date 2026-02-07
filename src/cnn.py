@@ -140,7 +140,7 @@ def train_net(n_epoch, criterion, optimizer, device, net, train_data):
     return net
 
 
-def evaluate(net, test_loader, device):
+def evaluate_acc(net, test_loader, device):
     net.eval()
 
     correct = 0
@@ -162,3 +162,82 @@ def evaluate(net, test_loader, device):
     return acc
 
 
+from sklearn.metrics import f1_score
+
+def evaluate_F1(net, test_loader, device):
+    net.eval()
+
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images = images.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+
+            outputs = net(images)
+            _, predicted = torch.max(outputs, 1)
+
+            all_preds.append(predicted.cpu())
+            all_labels.append(labels.cpu())
+
+    all_preds = torch.cat(all_preds).numpy()
+    all_labels = torch.cat(all_labels).numpy()
+
+    f1 = f1_score(all_labels, all_preds, average="macro")
+    print(f"F1 score on {len(all_labels)} test images: {f1:.4f}")
+    return f1
+
+
+import torch
+import pandas as pd
+
+def per_class_accuracy_tables(net, test_loader, device, class_names=None):
+    net.eval()
+
+    correct_per_class = None
+    total_per_class = None
+
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images = images.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+
+            outputs = net(images)
+            _, predicted = torch.max(outputs, 1)
+
+            num_classes = outputs.size(1)
+            if correct_per_class is None:
+                correct_per_class = torch.zeros(num_classes, dtype=torch.long)
+                total_per_class = torch.zeros(num_classes, dtype=torch.long)
+
+            labels_cpu = labels.detach().cpu()
+            pred_cpu = predicted.detach().cpu()
+
+            total_per_class += torch.bincount(labels_cpu, minlength=num_classes)
+            correct_per_class += torch.bincount(labels_cpu[pred_cpu == labels_cpu], minlength=num_classes)
+
+    acc_per_class = (correct_per_class.float() / total_per_class.clamp_min(1).float()).numpy()
+
+    if class_names is None:
+        class_names = [str(i) for i in range(len(acc_per_class))]
+    else:
+        class_names = list(class_names)
+
+    df = pd.DataFrame({
+        "class_name": class_names,
+        "accuracy": acc_per_class
+    })
+
+    df_sorted = df.sort_values("accuracy", ascending=False).reset_index(drop=True)
+
+    top10 = df_sorted.head(10).copy()
+    bottom10 = df_sorted.tail(10).sort_values("accuracy", ascending=True).reset_index(drop=True)
+
+    print("Top 10 Classes (highest Accuracy):")
+    print(top10.to_string(index=False))
+
+    print("\nTop 10 Classes (worst Accuracy):")
+    print(bottom10.to_string(index=False))
+
+    return top10, bottom10
