@@ -1,5 +1,5 @@
 data:
-  DATASET_PATH: 'CML/data/merged_dataset.nosync'
+  DATASET_PATH: "./data/datasets/zlatan599/mushroom1/versions/2/merged_dataset/"
   IMAGE_SIZE: 224
   BATCH_SIZE: 256
   NUM_WORKERS: 12

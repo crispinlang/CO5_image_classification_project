@@ -1,5 +1,4 @@
 import os
-import yaml
 
 # Avoid conflicts
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
@@ -7,10 +6,7 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
-
-def load_config(config_path="./config.yaml"):
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)
+from helpers import load_config
 
 def get_data(custom_transform=None):
     """

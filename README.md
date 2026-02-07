@@ -28,6 +28,17 @@ Based on this already developed framework we started working on the data import 
 
 ## Model
 
+### Benchmark CNN model
+
+A convolutional neural network (CNN) was implemented in PyTorch to establish a baseline for the mushroom image classification task. The baseline model was iteratively improved through a structured hyperparameter tuning and model optimization process, and its performance was later used as a reference for comparison with a CLIP-based model.
+
+Starting from a minimal CNN trained for two epochs with basic resizing, the model initially achieved very low accuracy. Successive training cycles introduced input normalization and data augmentation techniques such as random rotations and horizontal flips, which led to gradual performance improvements. A major increase in accuracy and training stability was achieved by adding batch normalization layers after the convolutional layers.
+
+Further gains were obtained by increasing the model capacity through wider convolutional layers and reducing the batch size to accommodate the larger network. The introduction of residual blocks enabled deeper feature learning and improved gradient flow. Finally, extending the training duration from two to six epochs resulted in the best baseline performance.
+
+Overall, the CNN baseline accuracy improved from approximately 7% to 34% through systematic architectural changes, data preprocessing enhancements, and longer training. This optimized CNN served as a baseline for subsequent comparison with a CLIP model on the same classification task.
+
+
 ### Model Specifications and Sources
 
 The BioCLIP model we chose to use was the original version [[4]](https://huggingface.co/imageomics/bioclip), which was trained on the 'TreeOfLife-10M' dataset. The basis of this model is the CLIP model version 'ViT-14/L' [[5]](https://huggingface.co/openai/clip-vit-base-patch16) trained on on a proprietary 'WIT-400M' dataset by OpenAI. Compared to the first BioCLIP iteration, the second version called 'bioclip-2' contains significantly more parameters (86M vs 304M) [[6]](https://imageomics.github.io/bioclip/),[[7]](https://arxiv.org/abs/2505.23883). Because we were unsure wether we wanted to scope to the project to include fine-tuning both a CLIP as well as a BioCLIP model, we chose to stick with the smaller sized 'BioCLIP' model, instead of the much larger 'bioclip-2'.
