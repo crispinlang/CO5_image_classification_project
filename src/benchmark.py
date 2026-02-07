@@ -56,7 +56,6 @@ def run_benchmark(model_name, pretrained=None):
             
             pbar.set_postfix(acc=f"{(correct/total)*100:.2f}%")
 
-
     final_acc = (correct / total) * 100
     print(f"\n {model_name} Final Accuracy: {final_acc:.2f}%")
     
