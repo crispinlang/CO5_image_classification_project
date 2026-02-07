@@ -27,7 +27,7 @@ def get_transform_data():
 ])
 
     dataset = datasets.ImageFolder(
-        root="archive/merged_dataset",
+        root="./data/datasets/zlatan599/mushroom1/versions/2/merged_dataset/",
         transform=transform
     )
 
