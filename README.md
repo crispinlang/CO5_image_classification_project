@@ -1,6 +1,6 @@
 # MushroomCLIP Documentation
 
-![Title image](/img/Pholiota_aurivella.png)
+![Title image](img/Pholiota_aurivella.png)
 [Haydenrjones, CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Pholiota_aurivella.png)
 
 ## Introduction
@@ -10,8 +10,6 @@ The aim of this project is to fine-tune an existing open source version of the C
 The goal was to see, if fine-tuning a similarly sized model with specific domain knowledge, which in this project was knowledge about various classes of mushrooms, could perform equally or even better then a model trained much more intently on a much larger dataset.
 
 ## Data
-
-### Acquisition
 
 The dataset consisting of ~100'000 images of different mushroom classes was adapted from a previously created Kaggle challenge [[3]](https://www.kaggle.com/datasets/zlatan599/mushroom1). After downloading the dataset, the final size came out to 12.2 GB of data made up of 169 individual classes of mushrooms spanning a total of 104'100 images. We split the data into three different parts: training (80%), testing (10%) and validation (10%). The dataset is significantly imbalanced, with the number of datapoints per class ranging from ~200 to ~5000. In most cases, the images are of mushrooms in their natural habitat in various growth stages, sometimes havested an layed out for display. Photos were taken from many different perspectives. The dataset contains images with subjects other than mushrooms and background scenerey, such as faces, shoes, utensils, desks, and so on. However, these were edge-cases, and no special action was taken with regards to them.
 
