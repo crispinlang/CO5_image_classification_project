@@ -6,7 +6,7 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
-from helpers import load_config
+from src.helpers import load_config
 
 def get_data(custom_transform=None):
     """
@@ -66,4 +66,3 @@ def get_data(custom_transform=None):
     test_loader = DataLoader(test_data, shuffle=False, **common_args)
 
     return train_loader, val_loader, test_loader
-

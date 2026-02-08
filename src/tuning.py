@@ -1,6 +1,6 @@
 from peft import LoraConfig, get_peft_model
 from transformers import CLIPModel, Trainer, TrainingArguments
-from src.preprocessing_rewrite import prepare_data
+from src.clip_preprocessing import prepare_data
 from src.clip_processing import clip_collator, clip_processor
 from src.helpers import load_config
 

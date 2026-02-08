@@ -7,14 +7,14 @@ import torch
 import open_clip
 from tqdm import tqdm
 
-from helpers import load_config
-from preprocessing import get_data
+from src.helpers import load_config, get_device
+from src.preprocessing import get_data
 
 cfg = load_config()
 data_cfg = cfg['data']
 
 def run_benchmark(model_name, pretrained=None):
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cuda")
+    device = get_device()
 
     model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrained=pretrained)
     tokenizer = open_clip.get_tokenizer(model_name)

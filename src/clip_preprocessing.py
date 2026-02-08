@@ -1,13 +1,16 @@
+from typing import Optional
+
 from datasets import load_dataset
 
 from src.helpers import load_config, build_image_transform
 
 
-def prepare_data(seed=1, prompt="a photo of {}", split_method=None):
+def prepare_data(seed=42, prompt="a photo of {}", split_method=None, dataset_path: Optional[str] = None):
     cfg = load_config()
     data_cfg = cfg["data"]
 
-    ds = load_dataset("imagefolder", data_dir=data_cfg["DATASET_PATH"])
+    data_dir = dataset_path or data_cfg["DATASET_PATH"]
+    ds = load_dataset("imagefolder", data_dir=data_dir)
     # https://huggingface.co/docs/datasets/v4.5.0/en/package_reference/loading_methods#datasets.load_dataset.example-4
     # loads the dataset and uses the folder names as features
 
