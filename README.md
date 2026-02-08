@@ -40,7 +40,7 @@ The CLIP model we chose to use was the 'ViT-B-32' version, which was trained on 
 
 This project provides a VS Code Dev Container [[9]](https://code.visualstudio.com/docs/devcontainers/containers) configuration that launches the required dependencies. The base image is the Nvidia PyTorch container [[10]](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch?version=25.11-py3) `nvcr.io/nvidia/pytorch:25.11-py3`, which includes GPU optimizations and support for the GB10 chip we used for this project.
 
-The repository structure was organized keeping ease of use and simplicity in mind like this:
+<!-- The repository structure was organized keeping ease of use and simplicity in mind like this:
 
 ```text
 CO5_image_classification_project/
@@ -56,7 +56,7 @@ CO5_image_classification_project/
 ├── config.yaml
 ├── .devcontainer
 └── project.ipynb
-```
+``` -->
 
 User-configurable variables are organized within `config.yaml` using chapters, allowing them to be called individually by each script via the `load_config` function. The implementation is shown below:
 
@@ -123,7 +123,7 @@ Interestingly, the model does not seem to have been impacted at all by the wide 
 
 ## Lessons learned and challenges faced
 
-Two different scripts were required for testing because of the specific way the model was fine-tuned. The standard models were tested using the open_clip library. However, the peft library was needed for the fine-tuned model because it was built using a special adapter method. 
+Two different scripts were required for testing because of the specific way the model was fine-tuned. The standard models were tested using the open_clip library. However, the peft library was needed for the fine-tuned model because it was built using a special adapter method.
 
 Additionally, the dataset was found to be imbalanced, meaning some species were very common while others were rare, as previously illustrated in `project.ipynb`. To address this, a weighted loss function was used during training so that rare species were not ignored. Finally, the Macro F1-score was chosen over simple accuracy for the final results. This metric was selected because equal importance is given to all species by it, regardless of how many images were available for them.
 
