@@ -13,7 +13,7 @@ The goal was to see, if fine-tuning a similarly sized model with specific domain
 
 ### Acquisition
 
-The dataset consisting of ~100'000 images of different mushroom classes was adapted from a previously created Kaggle challenge [[3]](https://www.kaggle.com/datasets/zlatan599/mushroom1). After downloading the dataset, the final size came out to 12.2 GB of data made up of 169 individual classes of mushrooms spanning a total of 104'100 images. We split the data into three different parts: training (80%), testing (10%) and validation (10%). Initial analysis of the dataset did not reveal any imbalances to be taken care of so we agreed to continue to benchmarking the selected models before fine-tuning, to assess their zero-shot capabilities before any fine-tuning.
+The dataset consisting of ~100'000 images of different mushroom classes was adapted from a previously created Kaggle challenge [[3]](https://www.kaggle.com/datasets/zlatan599/mushroom1). After downloading the dataset, the final size came out to 12.2 GB of data made up of 169 individual classes of mushrooms spanning a total of 104'100 images. We split the data into three different parts: training (80%), testing (10%) and validation (10%). The dataset is significantly imbalanced, with the number of datapoints per class ranging from ~200 to ~5000. In most cases, the images are of mushrooms in their natural habitat in various growth stages, sometimes havested an layed out for display. Photos were taken from many different perspectives. The dataset contains images with subjects other than mushrooms and background scenerey, such as faces, shoes, utensils, desks, and so on. However, these were edge-cases, and no special action was taken with regards to them.
 
 ## Model
 
