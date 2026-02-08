@@ -93,11 +93,15 @@ important functions such as the data gathering function `get_data` were written 
 
 ```text
 data import -> data processing -> model fine-tuning -> model evaluation
-```
+```tuning
 
-### Training/fine-tuning -> __Curdin schreibt__
+### Training/fine-tuning
 
 After gathering these first insights into the models behaviour it was decided to move on to training the selected CLIP model using a fine-tuning approach. During the lectures from the CO5 course, we have already learned about using Low-Rank Adaptation (LoRA) [[11]](https://arxiv.org/abs/2106.09685) for efficient model tuning. We searched for a framework that allowed us to use LoRA in a straightforward way without having to develop our own system and found the 'peft' library developed by huggingface [[11]](https://huggingface.co/blog/peft),[[12]](https://arxiv.org/abs/2312.12148) that allows for the easy implementation of different fine-tuning approaches into an already existing training + inference loop.
+
+The CLIP fine-tuning pipeline starts by preparing the mushroom image dataset in a format that can be used by CLIP. Each image label is converted into a simple text prompt such as “a photo of <class>”, which allows the model to learn image–text pairs. Images are resized to the required input size, and the data is split into training, validation, and test sets. To check whether the imbalance in the training data has an influence on the results, both random and stratified splits were tested.
+
+For training, the CLIP model is fine-tuned using a Low-Rank Adaptation (LoRA) approach, which makes it possible to adapt the model without retraining all of its parameters. Training is handled using the Hugging Face Trainer, with evaluation on the validation set after each epoch. Model checkpoints are saved at each epoch during training, and the best performing model is kept for final evaluation and comparison with the baseline and zero-shot results.
 
 ### Experimentation
 
