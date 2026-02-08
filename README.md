@@ -91,9 +91,7 @@ dataset = datasets.ImageFolder(
 
 important functions such as the data gathering function `get_data` were written inside their own .py scripts and combined in the main project file `project.ipynb` where these functions were then called and used for the full project pipeline:
 
-```text
-data import -> data processing -> model fine-tuning -> model evaluation
-```tuning
+```data import -> data processing -> model fine-tuning -> model evaluation```
 
 ### Training/fine-tuning
 
@@ -105,13 +103,9 @@ For training, the CLIP model is fine-tuned using a Low-Rank Adaptation (LoRA) ap
 
 ### Experimentation
 
-```python
-tuning.py
-```
+```python tuning.py```
 
-```python
-training.py
-```
+```python training.py```
 
 Talk about how we set up the tuning using the peft and LoRA setups and how we fed those into our training and inference loop.
 
