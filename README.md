@@ -38,56 +38,7 @@ The CLIP model we chose to use was the 'ViT-B-32' version, which was trained on 
 
 This project provides a VS Code Dev Container [[9]](https://code.visualstudio.com/docs/devcontainers/containers) configuration that launches the required dependencies. The base image is the Nvidia PyTorch container [[10]](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch?version=25.11-py3) `nvcr.io/nvidia/pytorch:25.11-py3`, which includes GPU optimizations and support for the GB10 chip we used for this project.
 
-<!-- The repository structure was organized keeping ease of use and simplicity in mind like this:
-
-```text
-CO5_image_classification_project/
-├── data/ 
-├── img/ 
-├── src/ 
-│ ├── benchmark.py
-│ ├── evaluation.py
-│ ├── preprocessing.py
-│ └── tuning.py
-├── .gitignore
-├── README.md
-├── config.yaml
-├── .devcontainer
-└── project.ipynb
-``` -->
-
-User-configurable variables are organized within `config.yaml` using chapters, allowing them to be called individually by each script via the `load_config` function. The implementation is shown below:
-
-```yaml
-### config.yaml chapter structuring
-data:
-  DATASET_PATH: 'path/to/data'
-  IMAGE_SIZE: 224
-  BATCH_SIZE: 256
-```
-
-```python
-def load_config(config_path="./config.yaml"):
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)
-```
-
-This function is utilized by all scripts requiring variable access. The following snippets demonstrate how it was used within the code:
-
-```python
-### example for accessing a config chapter inside 'preprocessing.py'
-cfg = load_config()
-data_cfg = cfg['data']
-model_cfg = cfg['model']
-
-### example usage of a specific variable from a config chapter inside 'preprocessing.py'
-dataset = datasets.ImageFolder(
-    root=data_cfg['DATASET_PATH'],
-    transform=transform
-)
-```
-
-important functions such as the data gathering function `get_data` were written inside their own .py scripts and combined in the main project file `project.ipynb` where these functions were then called and used for the full project pipeline:
+User-configurable variables were organized within `config.yaml` using chapters, allowing them to be called individually by each script via the `load_config` function. Functions utilized multiple times were organized in the `helper.py` script and called from there when needed in another script. Important functions such as the data gathering function `get_data` were written inside their own .py scripts and combined in the main project file `project.ipynb` where these functions were then called and used for the full project pipeline:
 
 ```data import -> data processing -> model fine-tuning -> model evaluation```
 
@@ -125,22 +76,8 @@ Two different scripts were required for testing because of the specific way the 
 
 Additionally, the dataset was found to be imbalanced, meaning some species were very common while others were rare, as previously illustrated in `project.ipynb`. To address this, a weighted loss function was used during training so that rare species were not ignored. Finally, the Macro F1-score was chosen over simple accuracy for the final results. This metric was selected because equal importance is given to all species by it, regardless of how many images were available for them.
 
-<!-- ## Project grading
-
-From the MSLS pdf:
-
-- [x] Choose a task that can be solved with common gen AI model discussed in the course. Unorthodox and risky yet sound tasks whose result would be difficult to assess are also welcomed. Explain the task to be solved. (5 scores) *Used models from the CLIP family, but adapted them using a previously created framework*
-
-- [x] Search for an appropriate data set for your task. Describe the dataset. (5 scores) -> *used Kaggle dataset for the project and explained it's content*
-
-- [x] Point out, possibly, related work, problems, or tasks in the literature. (5 scores) -> *Talked about the creation of BioCLIP model in the introduction*
-
-- [x] Preprocess your data and explain the process. (5 scores) -> *Talk about the preprocessing script*
-
-- [ ] Explain your model, the model architecture, parameters, methods, etc. (5 scores)
-
-- [ ] Experiment with your model. Change it, tune hyperparameters, etc. Do not copy-paste a model without substantially adopting it to your task. Explain your final model. (15 scores)
-
-- [ ] Explain and visualize your results. (5 scores)
-
-- [ ] List the lessons you learned and challenges you faced during the project. Point out further work or ideas. (5 scores) -->
+## Outlook
+x
+x
+x
+x
