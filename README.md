@@ -101,13 +101,11 @@ The CLIP fine-tuning pipeline starts by preparing the mushroom image dataset in 
 
 For training, the CLIP model is fine-tuned using a Low-Rank Adaptation (LoRA) approach, which makes it possible to adapt the model without retraining all of its parameters. Training is handled using the Hugging Face Trainer, with evaluation on the validation set after each epoch. Model checkpoints are saved at each epoch during training, and the best performing model is kept for final evaluation and comparison with the baseline and zero-shot results.
 
-### Experimentation
+Fine tuning was done in the file `tuning.ipynb` and took roughly 3 minutes per epoch, for a total of 30 minutes.
 
-```python tuning.py```
+### Inference
 
-```python training.py```
-
-Talk about how we set up the tuning using the peft and LoRA setups and how we fed those into our training and inference loop.
+For inference, we evaluated the model on the held-out test split by converting all class names into text prompts (`"a photo of {}"`). The test split remained consistent across runs because we used a fixed seed. The prompts were encoded once, and each test image batch was then encoded with the CLIP image encoder. We normalized image/text features, computed similarity logits, and used these scores to produce predictions and report Top-1/Top-3/Top-5 accuracy. The macro-F1 score was also computed, since it provides insight into the models performance on imbalanced datasets.
 
 ## Results
 
