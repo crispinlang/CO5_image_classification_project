@@ -1,7 +1,7 @@
 # MushroomCLIP Documentation
 
-![Title image](/img/title_image.jpg)
-[Image credit](https://blog.mdpi.com/2023/02/21/importance-of-mushrooms/)
+![Title image](/img/Pholiota_aurivella.png)
+[Haydenrjones, CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Pholiota_aurivella.png)
 
 ## Introduction
 
@@ -14,17 +14,6 @@ The goal was to see, if fine-tuning a similarly sized model with specific domain
 ### Acquisition
 
 The dataset consisting of ~100'000 images of different mushroom classes was adapted from a previously created Kaggle challenge [[3]](https://www.kaggle.com/datasets/zlatan599/mushroom1). After downloading the dataset, the final size came out to 12.2 GB of data made up of 169 individual classes of mushrooms spanning a total of 104'100 images. We split the data into three different parts: training (80%), testing (10%) and validation (10%). Initial analysis of the dataset did not reveal any imbalances to be taken care of so we agreed to continue to benchmarking the selected models before fine-tuning, to assess their zero-shot capabilities before any fine-tuning.
-
-### Benchmarking
-
-Benchmarking the models without any modification yielded interesting results:
-
-- The BioCLIP model had a final accuracy of 77.71% accuracy
-- The OpenCLIP model had a final accuracy of 9.64% accuracy
-
-These benchmarking tests clearly showed that when using a model not specifically trained on biological data, but rather on a dataset consisting of various data types, it lacked the needed domain knowledge for high accuracy class prediction.
-
-Based on this already developed framework we started working on the data import and pre-processing scripts that collect and format the data for further use which will be detailed further in the following chapter.
 
 ## Model
 
@@ -40,7 +29,6 @@ Overall, the CNN baseline accuracy improved from approximately 7% to 34% through
 
 It is important to note that because of the class imbalances observed in the data inspection part, the CNN model was strongly biased towards overrepresented classes.
 When looking at the accuracy scores for the individual classes one can observe that for the class with the most pictures "Xanthoria parietina", which includes about 6000 pictures, the model reaches an accuracy of 94%. In contrast, for classes like "Suillus granulatus", which only includes about 200 examples, the model only reaches an accuracy of 0.0%, missclassifying all of the pictures.
-
 
 ### Model Specifications and Sources
 
@@ -107,7 +95,7 @@ important functions such as the data gathering function `get_data` were written 
 data import -> data processing -> model fine-tuning -> model evaluation
 ```
 
-### Training/fine-tuning
+### Training/fine-tuning -> __Curdin schreibt__
 
 After gathering these first insights into the models behaviour it was decided to move on to training the selected CLIP model using a fine-tuning approach. During the lectures from the CO5 course, we have already learned about using Low-Rank Adaptation (LoRA) [[11]](https://arxiv.org/abs/2106.09685) for efficient model tuning. We searched for a framework that allowed us to use LoRA in a straightforward way without having to develop our own system and found the 'peft' library developed by huggingface [[11]](https://huggingface.co/blog/peft),[[12]](https://arxiv.org/abs/2312.12148) that allows for the easy implementation of different fine-tuning approaches into an already existing training + inference loop.
 
@@ -125,18 +113,19 @@ Talk about how we set up the tuning using the peft and LoRA setups and how we fe
 
 ## Results
 
-```python
-visualize.py
-```
+After gathering all of the results, from the non fine-tuned as well as the fine-tuned versions, we could analyze them in a single graphic. As is visible in the figure below, the non fine-tuned models all performed below the fine-tuned version of the CLIP models. These results were achieved after 3 epochs of training the model on the training partition of the dataset, with the testing portion being used for benchmark testing.
 
-Show the graphs that we generated for testing accuracy
+Due to the way the model was fine-tuned, it was required to have two different benchmarking scripts. 
+
+![Results](img/Model_benchmark.png)
 
 ## Lessons learned and challenges faced
 
-- For classification tasks it is really important to check for class imbalances first, then perform appropriate tasks to counter imbalanced data
-- 
+Two different scripts were required for testing because of the specific way the model was fine-tuned. The standard models were tested using the open_clip library. However, the peft library was needed for the fine-tuned model because it was built using a special adapter method. 
 
-## Project grading
+Additionally, the dataset was found to be imbalanced, meaning some species were very common while others were rare, as previously illustrated in `project.ipynb`. To address this, a weighted loss function was used during training so that rare species were not ignored. Finally, the Macro F1-score was chosen over simple accuracy for the final results. This metric was selected because equal importance is given to all species by it, regardless of how many images were available for them.
+
+<!-- ## Project grading
 
 From the MSLS pdf:
 
@@ -154,4 +143,4 @@ From the MSLS pdf:
 
 - [ ] Explain and visualize your results. (5 scores)
 
-- [ ] List the lessons you learned and challenges you faced during the project. Point out further work or ideas. (5 scores)
+- [ ] List the lessons you learned and challenges you faced during the project. Point out further work or ideas. (5 scores) -->
