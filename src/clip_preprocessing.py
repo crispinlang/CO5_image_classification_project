@@ -3,7 +3,7 @@ from datasets import load_dataset
 from src.helpers import load_config, build_image_transform
 
 
-def prepare_data(seed=1, prompt="a photo of {}", split_method=None):
+def prepare_data(seed=42, prompt="a photo of {}", split_method=None):
     cfg = load_config()
     data_cfg = cfg["data"]
 

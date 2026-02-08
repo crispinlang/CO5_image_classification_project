@@ -6,7 +6,7 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms
-from helpers import load_config
+from src.helpers import load_config
 
 def get_data(custom_transform=None):
     """
