@@ -109,11 +109,15 @@ For inference, we evaluated the model on the held-out test split by converting a
 
 ## Results
 
-After gathering all of the results, from the non fine-tuned as well as the fine-tuned versions, we could analyze them in a single graphic. As is visible in the figure below, the non fine-tuned models all performed below the fine-tuned version of the CLIP models. These results were achieved after 3 epochs of training the model on the training partition of the dataset, with the testing portion being used for benchmark testing.
+After gathering all of the results, from the non fine-tuned as well as the fine-tuned versions, we could analyze them in a single graphic. As is visible in the figure below, the non fine-tuned models all performed below the fine-tuned version of the CLIP models. These results were achieved after 8 epochs of training the model on the training partition of the dataset, with the testing portion being used for benchmark testing.
 
-Due to the way the model was fine-tuned, it was required to have two different benchmarking scripts. 
+Due to the way the model was fine-tuned (open-clip vs Huggingface CLIP), it was required to have two different benchmarking scripts. 
 
 ![Results](img/Model_benchmark.png)
+
+As can be seen in the image below, fine tuning showed diminishing returns after 4-5 epochs, with epoch 7 having markedly lower performance than previous epochs. While the model recovered in the following epoch, the instability could indicate that either the learning rate was set too high, or that the model has begun overfitting.
+
+![epoch_metrics](img/epoch_metrics.png)
 
 ## Lessons learned and challenges faced
 
