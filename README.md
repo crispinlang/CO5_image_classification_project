@@ -105,7 +105,7 @@ Fine tuning was done in the file `tuning.ipynb` and took roughly 3 minutes per e
 
 ### Inference
 
-For inference, we evaluated the model on the held-out test split by converting all class names into text prompts (`"a photo of {}"`). The test split remained consistent across runs because we used a fixed seed. The prompts were encoded once, and each test image batch was then encoded with the CLIP image encoder. We normalized image/text features, computed similarity logits, and used these scores to produce predictions and report Top-1/Top-3/Top-5 accuracy. The macro-F1 score was also computed, since it provides insight into the models performance on imbalanced datasets.
+For inference, the base model was loaded, and then the adapter was applied from each epoch. We evaluated the model on the held-out test split by converting all class names into text prompts (`"a photo of {}"`). The test split remained consistent across runs because we used a fixed seed. The prompts were encoded once, and each test image batch was then encoded with the CLIP image encoder. We normalized image/text features, computed similarity logits, and used these scores to produce predictions and report Top-1/Top-3/Top-5 accuracy. The macro-F1 score was also computed, since it provides insight into the models performance on imbalanced datasets.
 
 ## Results
 
