@@ -119,6 +119,8 @@ As can be seen in the image below, fine tuning showed diminishing returns after 
 
 ![epoch_metrics](img/epoch_metrics.png)
 
+Interestingly, the model does not seem to have been impacted at all by the wide disparity in the number of samples for certain classes (as previously mentioned, ranging from ~200 to ~5000). We expected to find that the macro f1 score, which is more strongly impacted by poorly performing under represented classes, would score noticably higher in the stratified split learning approach. Perhaps the underlying model is more resilient to such imbalances than traditional machine learning methods (like CNN), because its large set of pre-training data teaches it to better generalize - but this is speculation on our part.
+
 ## Lessons learned and challenges faced
 
 Two different scripts were required for testing because of the specific way the model was fine-tuned. The standard models were tested using the open_clip library. However, the peft library was needed for the fine-tuned model because it was built using a special adapter method. 
