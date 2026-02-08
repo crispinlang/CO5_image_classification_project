@@ -38,6 +38,9 @@ Further gains were obtained by increasing the model capacity through wider convo
 
 Overall, the CNN baseline accuracy improved from approximately 7% to 34% through systematic architectural changes, data preprocessing enhancements, and longer training. This optimized CNN served as a baseline for subsequent comparison with a CLIP model on the same classification task.
 
+It is important to note that because of the class imbalances observed in the data inspection part, the CNN model was strongly biased towards overrepresented classes.
+When looking at the accuracy scores for the individual classes one can observe that for the class with the most pictures "Xanthoria parietina", which includes about 6000 pictures, the model reaches an accuracy of 94%. In contrast, for classes like "Suillus granulatus", which only includes about 200 examples, the model only reaches an accuracy of 0.0%, missclassifying all of the pictures.
+
 
 ### Model Specifications and Sources
 
@@ -127,6 +130,11 @@ visualize.py
 ```
 
 Show the graphs that we generated for testing accuracy
+
+## Lessons learned and challenges faced
+
+- For classification tasks it is really important to check for class imbalances first, then perform appropriate tasks to counter imbalanced data
+- 
 
 ## Project grading
 
