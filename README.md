@@ -127,7 +127,7 @@ Additionally, the dataset was found to be imbalanced, meaning some species were 
 
 ## Outlook
 
-With the training pipeline bein established, additional perfomance gains could be made by expanding the number of samples, especially in poorly represented classes. Expanding the pipeline by adding a segmentation model that isolates the mushrooms, eliminating non-mushroom subjects from the images may also help keep the dataset focused. Another possible avenue, although not machine learning related, would be to geoblock species based on image metadata and known habitat zones.
+With the training pipeline now being established, additional perfomance gains could be made by expanding the number of samples, especially in poorly represented classes. Expanding the pipeline by adding a segmentation model that isolates the mushrooms, eliminating non-mushroom subjects from the images may also help keep the dataset focused. Another possible avenue, although not machine learning related, would be to geoblock species based on image metadata and known habitat zones.
 
 <!-- ## Project grading
 
