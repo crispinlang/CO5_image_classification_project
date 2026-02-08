@@ -76,8 +76,10 @@ Two different scripts were required for testing because of the specific way the 
 
 Additionally, the dataset was found to be imbalanced, meaning some species were very common while others were rare, as previously illustrated in `project.ipynb`. To address this, a weighted loss function was used during training so that rare species were not ignored. Finally, the Macro F1-score was chosen over simple accuracy for the final results. This metric was selected because equal importance is given to all species by it, regardless of how many images were available for them.
 
-## Outlook
-x
-x
-x
-x
+## Outlook
+
+With the training pipeline now being established, additional perfomance gains could be made by expanding the number of samples, especially in poorly represented classes. Expanding the pipeline by adding a segmentation model that isolates the mushrooms, eliminating non-mushroom subjects from the images may also help keep the dataset focused. Another possible avenue, although not machine learning related, would be to geoblock species based on image metadata and known habitat zones.
+
+## Outlook
+
+With the training pipeline now being established, additional perfomance gains could be made by expanding the number of samples, especially in poorly represented classes. Expanding the pipeline by adding a segmentation model that isolates the mushrooms, eliminating non-mushroom subjects from the images may also help keep the dataset focused. Another possible avenue, although not machine learning related, would be to geoblock species based on image metadata and known habitat zones.
